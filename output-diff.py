@@ -30,7 +30,9 @@ def get_branches(repo_url, password, git_path):
     """ リポジトリのブランチを一覧表示する """
     url_with_credentials = repo_url.replace('https://', f'https://{password}@')
     repo_name = repo_url.split('/')[-1].split('.')[0]
-
+    clone_dir = './tmp_clone'
+    os.makedirs(clone_dir, exist_ok=True)
+    os.chdir(clone_dir)
     # リポジトリのディレクトリが既に存在するかチェック
     if os.path.isdir(repo_name):
         # リポジトリが存在する場合、ディレクトリに移動して fetch と pull を実行
@@ -48,7 +50,7 @@ def get_branches(repo_url, password, git_path):
         stderr=subprocess.DEVNULL
     ).decode('utf-8')
 
-    os.chdir('..')  # 元のディレクトリに戻る
+    os.chdir('../..')  # 元のディレクトリに戻る
     return branches
 
 
@@ -68,10 +70,11 @@ def select_branch(branches):
 
 def get_diff(selected_branch, repo_url, git_path):
     """ 選択したブランチとの差分を取得する """
+    os.chdir('./tmp_clone')
     repo_name = repo_url.split('/')[-1].split('.')[0]
     os.chdir(repo_name)
     diff_output = subprocess.check_output([git_path, 'diff', 'origin/main', selected_branch])
-    os.chdir('..')  # 元のディレクトリに戻る
+    os.chdir('../..')  # 元のディレクトリに戻る
     return diff_output
 
 # 設定ファイルの一覧を取得
@@ -96,5 +99,4 @@ diff_output = get_diff(selected_branch, repo_url, git_path)
 branch_name = selected_branch.split('/')[-1]
 with open(f'{branch_name}.txt', 'wb') as f:
     f.write(diff_output)
-
 print('差分を出力しました。')
