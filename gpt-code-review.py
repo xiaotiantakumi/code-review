@@ -33,7 +33,7 @@ def call_chatgpt_api(code_to_review, api_token):
         "Content-Type": "application/json"
     }
     data = {
-        "model": "gpt-4-1106-preview",
+        "model": "gpt-3.5-turbo-1106",
         "messages": [
             {"role": "system", "content": "You are an experienced systems engineer. You are very keen to ensure "
                                           "quality by conducting rigorous code reviews of your colleagues."},
@@ -54,7 +54,8 @@ def save_review_result(file_name, review_result):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    output_file_path = os.path.join(output_dir, f"{file_name}review.txt")
+    file_name_except_ext = os.path.splitext(file_name)[0]
+    output_file_path = os.path.join(output_dir, f"{file_name_except_ext}-review.txt")
     with open(output_file_path, 'w') as file:
         file.write(review_result)
 
