@@ -61,7 +61,7 @@ def save_review_result(file_name, review_result):
 
 
 def main():
-    api_token = load_api_token()
+    api_token = os.environ.get('OPENAI_API_KEY')
     file_to_review = select_file_to_review()
 
     with open(file_to_review, 'r') as file:
