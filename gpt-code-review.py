@@ -3,7 +3,7 @@ import configparser
 import inquirer
 import glob
 import os
-
+from openai import OpenAI
 
 def load_api_token():
     """ ./.env/config.txtからChatGPTのAPIトークンを読み込む """
@@ -27,25 +27,34 @@ def select_file_to_review():
 
 def call_chatgpt_api(code_to_review, api_token):
     """ ChatGPT APIを呼び出してコードレビューを行う """
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_token}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "model": "gpt-3.5-turbo-1106",
-        "messages": [
+    client = OpenAI()
+    # url = "https://api.openai.com/v1/chat/completions"
+    # headers = {
+    #     "Authorization": f"Bearer {api_token}",
+    #     "Content-Type": "application/json"
+    # }
+    # data = {
+    #     "model": "gpt-3.5-turbo-1106",
+    #     "messages": [
+    #         {"role": "system", "content": "You are an experienced systems engineer. You are very keen to ensure "
+    #                                       "quality by conducting rigorous code reviews of your colleagues."},
+    #         {"role": "user", "content": f"Please do a rigorous code review:\n\n{code_to_review}\n"}
+    #     ]
+    # }
+    # response = requests.post(url, headers=headers, json=data)
+    #
+    # # レスポンスの完全な内容を確認するための出力
+    # print("Response from API:", response.json())
+    completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
             {"role": "system", "content": "You are an experienced systems engineer. You are very keen to ensure "
                                           "quality by conducting rigorous code reviews of your colleagues."},
             {"role": "user", "content": f"Please do a rigorous code review:\n\n{code_to_review}\n"}
         ]
-    }
-    response = requests.post(url, headers=headers, json=data)
-
-    # レスポンスの完全な内容を確認するための出力
-    print("Response from API:", response.json())
-
-    return response.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+    )
+    return completion.choices[0].message.content
+    # return response.json().get("choices", [{}])[0].get("message", {}).get("content", "")
 
 
 def save_review_result(file_name, review_result):
