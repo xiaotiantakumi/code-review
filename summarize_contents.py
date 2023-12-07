@@ -1,8 +1,25 @@
 import os
 import sys
+import fnmatch
+import argparse
 
 # 除外するファイルやディレクトリのパターン
-EXCLUDE_PATTERNS = {'.gitignore', '.venv', 'venv', '.git', '.vscode', 'node_modules', 'package-lock.json'}
+EXCLUDE_PATTERNS = {'.*','**/.*','venv', 'node_modules', 'package-lock.json'}
+
+def read_gitignore(gitignore_path, base_path):
+    patterns = set()
+    try:
+        with open(gitignore_path, 'r', encoding='utf-8') as file:
+            for line in file:
+                stripped_line = line.strip()
+                if stripped_line and not stripped_line.startswith('#'):
+                    # パターンに基準となるディレクトリのパスを追加
+                    full_pattern = os.path.join(base_path, stripped_line)
+                    patterns.add(full_pattern)
+    except FileNotFoundError:
+        print(f"No .gitignore file found at {gitignore_path}")
+    return patterns
+
 
 def is_binary(file_path):
     try:
@@ -17,11 +34,15 @@ def is_binary(file_path):
 
 def should_exclude(file_path):
     for pattern in EXCLUDE_PATTERNS:
-        if pattern in file_path:
+        if fnmatch.fnmatch(file_path, pattern):
             return True
     return False
 
-def summarize_directory_contents(dir_path, output_file='summary.txt'):
+def summarize_directory_contents(dir_path, include_gitignore, output_file='summary.txt'):
+    if include_gitignore:
+        gitignore_path = os.path.join(dir_path, '.gitignore')
+        EXCLUDE_PATTERNS.update(read_gitignore(gitignore_path, dir_path))
+        
     with open(output_file, 'w', encoding='utf-8') as summary_file:
         for root, dirs, files in os.walk(dir_path):
             # ディレクトリの除外
@@ -39,9 +60,10 @@ def summarize_directory_contents(dir_path, output_file='summary.txt'):
                     summary_file.write('\n```\n\n')
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: python summarize_contents.py [directory_path]")
-    else:
-        dir_path = sys.argv[1]
-        summarize_directory_contents(dir_path)
-        print(f'summarized in summary.txt')
+    parser = argparse.ArgumentParser(description='Summarize the contents of a directory')
+    parser.add_argument('--path', required=True, help='Path to the directory to summarize')
+    parser.add_argument('--include_ignore', type=bool, default=False, help='Include patterns from .gitignore')
+    args = parser.parse_args()
+
+    summarize_directory_contents(args.path, args.include_ignore)
+    print(f'Summarized in summary.txt')
