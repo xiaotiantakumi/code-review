@@ -4,7 +4,7 @@ import fnmatch
 import argparse
 
 # 除外するファイルやディレクトリのパターン
-EXCLUDE_PATTERNS = {'.*','**/.*','venv', 'node_modules', 'package-lock.json'}
+EXCLUDE_PATTERNS = {'.*','**/.*','venv', 'node_modules/*', 'package-lock.json', 'dist/*'}
 
 def read_gitignore(gitignore_path, base_path):
     patterns = set()
@@ -64,6 +64,6 @@ if __name__ == '__main__':
     parser.add_argument('--path', required=True, help='Path to the directory to summarize')
     parser.add_argument('--include_ignore', type=bool, default=False, help='Include patterns from .gitignore')
     args = parser.parse_args()
-
+    print(args)
     summarize_directory_contents(args.path, args.include_ignore)
     print(f'Summarized in summary.txt')
