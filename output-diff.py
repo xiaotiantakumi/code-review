@@ -100,3 +100,4 @@ branch_name = selected_branch.split('/')[-1]
 with open(f'{branch_name}.txt', 'wb') as f:
     f.write(diff_output)
 print('差分を出力しました。')
+print(f'ファイルのフルパス: {os.path.abspath(f"{branch_name}.txt")}')
