@@ -44,6 +44,13 @@ From https://dev.azure.com/xxx
 既にリポジトリが存在する場合は、fetch して pull するようになっている。
 存在しない場合は、clone するようになっている。
 
+もし、リポジトリーの内容が更新されていない場合は、
+tmp_clone ディレクトリーを削除してから再度実行してください。
+
+```
+[?] リポジトリーが存在します。fetch して pull しますか？::  y
+```
+
 処理が完了したら、「差分を出力しました。」と表示され、カレントディレクトリに差分ファイルが出力されます。
 差分ファイルの名前は、ブランチ名になります。
 
@@ -128,11 +135,12 @@ summarize_contents.py は、指定されたディレクトリ内のファイル�
 コマンドラインから以下のようにスクリプトを実行します:
 
 ```bash
-python summarize_contents.py --path <ディレクトリのパス> [--include_ignore <True/False>]
+python summarize_contents.py --path <ディレクトリのパス> [--include_ignore <True/False>] [--output_file <出力ファイル名>]
 ```
 
 --path: 概要を作成するディレクトリのパス（必須）。
 --include_ignore: .gitignore ファイルのパターンを考慮に入れるかどうか（オプション、デフォルトは False）。
+--output_file: 出力ファイルの名前（オプション、デフォルトは summary.txt）。
 
 ディレクトリのスキャン: 指定されたディレクトリ内の全ファイルとサブディレクトリを再帰的にスキャンします。
 除外パターン: .gitignore や EXCLUDE_PATTERNS に定義されたパターンにマッチするファイルやディレクトリは処理されません。
